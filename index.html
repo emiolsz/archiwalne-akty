@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Generator Aktów Archiwalnych</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@600;800&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Courier+Prime:ital,wght@0,700;1,700&family=EB+Garamond:ital,wght@0,600;1,600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Playwrite+PL:wght@300&display=swap" rel="stylesheet">
+    <script src="https://cloudflare.com"></script>
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        :root { --bg-paper: #e6dfc3; --ink-print: #2b231a; --ink-hand: #192743; --margin-line: #a69875; --akt-font-size: 1.15rem; --handwriting-font: 'Playwrite PL', cursive; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #4a4e51; display: flex; gap: 25px; height: 95vh; }
+        .form-container { flex: 1; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); overflow-y: auto; box-sizing: border-box; }
+        .preview-container { width: 210mm; height: 297mm; min-width: 210mm; background-color: var(--bg-paper); color: var(--ink-print); box-shadow: inset 0 0 50px rgba(0,0,0,0.2), 5px 5px 25px rgba(0,0,0,0.4); border: 1px solid #baa882; display: flex; position: relative; box-sizing: border-box; }
+        .akt-side-margin { flex: 1; max-width: 25%; padding: 60px 20px; box-sizing: border-box; border-right: 2px solid var(--margin-line); text-align: right; }
+        .akt-main-text { flex: 3; max-width: 75%; padding: 60px 45px; font-family: 'Playfair Display', serif; font-size: var(--akt-font-size); line-height: 2.4; text-align: justify; box-sizing: border-box; }
+        .form-group { margin-bottom: 12px; display: flex; flex-direction: column; }
+        label { margin-bottom: 4px; font-weight: 600; font-size: 0.85rem; color: #34495e; }
+        input, textarea, select { padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
+        .recznie { font-family: var(--handwriting-font); font-size: 1.05em; font-weight: bold; color: var(--ink-hand); padding: 0 4px; display: inline; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .btn { padding: 14px; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.95rem; width: 100%; }
+        .btn-pdf { background: #2980b9; } .btn-jpg { background: #27ae60; } .btn-crop { background: #e67e22; } .btn-crop.active { background: #c0392b; }
+        .crop-mode { cursor: crosshair !important; }
+        .crop-selection { border: 2px dashed #c0392b; background: rgba(192, 57, 43, 0.15); position: absolute; z-index: 9999; display: none; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div id="crop-box" class="crop-selection"></div>
+    <div class="form-container">
+        <h2>Panel Sterowania</h2>
+        <div class="form-group">
+            <label>Wybierz rodzaj aktu:</label>
+            <select id="f_typ_aktu" onchange="wczytajSzablon()">
+                <option value="malzenstwo">Akt Małżeństwa</option>
+                <option value="urodzenia">Akt Urodzenia i Chrztu</option>
+                <option value="zgon">Akt Zgonu</option>
+            </select>
+        </div>
+        <div id="miejsce-na-formularz"></div>
+        <div class="btn-group">
+            <button class="btn btn-pdf" onclick="window.print()">🖨️ Drukuj / PDF</button>
+            <button class="btn btn-jpg" onclick="pobierzJakoJPG()">🖼️ Pobierz JPG</button>
+            <button class="btn btn-crop" id="crop-btn" onclick="toggleCropMode()">✂️ Kopiuj fragment (PNG)</button>
+        </div>
+    </div>
+    <div class="preview-container" id="preview-wrapper">
+        <div class="akt-side-margin">
+            <span style="font-family:'Cinzel';font-size:2.6rem;font-weight:800;">№</span><span class="recznie" id="p_nr_aktu"></span>
+            <br><br><span class="recznie" id="p_miejscowosc_margines" style="font-size:1.3rem;"></span>
+        </div>
+        <div class="akt-main-text" id="miejsce-na-tekst-aktu"></div>
+    </div>
+    <script>
+        let pyodideInstance = null;
+        async function initPython() { pyodideInstance = await loadPyodide(); await pyodideInstance.runPythonAsync(`baza_aktow = {}\nimport json`); }
+        initPython();
+
+        function wczytajSzablon() {
+            const typ = document.getElementById('f_typ_aktu').value;
+            fetch(`akt_${typ}.html`)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    document.getElementById('miejsce-na-formularz').innerHTML = doc.getElementById('form-inputs').innerHTML;
+                    document.getElementById('miejsce-na-tekst-aktu').innerHTML = doc.getElementById('form-text').innerHTML;
+                    
+                    const inputs = document.getElementById('miejsce-na-formularz').querySelectorAll('input, textarea, select');
+                    inputs.forEach(el => el.addEventListener('input', updatePreview));
+                    updatePreview();
+                });
+        }
+        function updatePreview() {
+            const inputs = document.getElementById('miejsce-na-formularz').querySelectorAll('input, textarea, select');
+            inputs.forEach(el => {
+                const pId = el.id.replace('f_', 'p_');
+                const target = document.getElementById(pId);
+                if(target) target.innerText = el.value;
+            });
+            const nr = document.getElementById('f_nr_aktu'); if(nr) document.getElementById('p_nr_aktu').innerText = nr.value;
+            const mj = document.getElementById('f_miejscowosc_margines'); if(mj) document.getElementById('p_miejscowosc_margines').innerText = mj.value;
+        }
+        function pobierzJakoJPG() { html2canvas(document.getElementById('preview-wrapper'), { scale: 2, useCORS: true }).then(canvas => { const link = document.createElement('a'); link.download = 'akt.jpg'; link.href = canvas.toDataURL('image/jpeg', 0.9); link.click(); }); }
+        let isCropMode = false; let isDrawing = false; let startX, startY; const previewEl = document.getElementById('preview-wrapper'); const cropBox = document.getElementById('crop-box');
+        function toggleCropMode() { isCropMode = !isCropMode; const btn = document.getElementById('crop-btn'); if (isCropMode) { btn.classList.add('active'); btn.innerText = " Zakreśl myszką..."; previewEl.classList.add('crop-mode'); } else { btn.classList.remove('active'); btn.innerText = " Kopiuj fragment (PNG)"; previewEl.classList.remove('crop-mode'); cropBox.style.display = 'none'; } }
+        previewEl.addEventListener('mousedown', (e) => { if (!isCropMode) return; isDrawing = true; const rect = previewEl.getBoundingClientRect(); startX = e.clientX - rect.left; startY = e.clientY - rect.top; cropBox.style.left = e.clientX + 'px'; cropBox.style.top = e.clientY + 'px'; cropBox.style.width = '0px'; cropBox.style.height = '0px'; cropBox.style.display = 'block'; });
+        window.addEventListener('mousemove', (e) => { if (!isCropMode || !isDrawing) return; const rect = previewEl.getBoundingClientRect(); const currentX = e.clientX - rect.left; const currentY = e.clientY - rect.top; const width = Math.abs(currentX - startX); const height = Math.abs(currentY - startY); cropBox.style.left = Math.min(startX, currentX) + rect.left + 'px'; cropBox.style.top = Math.min(startY, currentY) + rect.top + 'px'; cropBox.style.width = width + 'px'; cropBox.style.height = height + 'px'; });
+        window.addEventListener('mouseup', (e) => { if (!isCropMode || !isDrawing) return; isDrawing = false; const rect = previewEl.getBoundingClientRect(); const currentX = e.clientX - rect.left; const currentY = e.clientY - rect.top; const x = Math.min(startX, currentX); const y = Math.min(startY, currentY); const width = Math.abs(currentX - startX); const height = Math.abs(currentY - startY); if (width > 10 && height > 10) { html2canvas(previewEl, { scale: 2, useCORS: true, x: x, y: y, width: width, height: height }).then(canvas => { canvas.toBlob((blob) => { navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(() => { alert("Skopiowano fragment!"); toggleCropMode(); }); }, 'image/png'); }); } else { cropBox.style.display = 'none'; } });
+        window.onload = wczytajSzablon;
+    </script>
+</body>
+</html>
+
