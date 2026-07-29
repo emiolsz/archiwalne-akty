@@ -28,7 +28,7 @@
 </head>
 <body>
     <div id="crop-box" class="crop-selection"></div>
-    <div class="form-container">
+        <div class="form-container">
         <h2>Panel Sterowania</h2>
         <div class="form-group">
             <label>Wybierz rodzaj aktu:</label>
@@ -38,6 +38,29 @@
                 <option value="zgon">Akt Zgonu</option>
             </select>
         </div>
+        <div class="form-group" id="opcja-kroju">
+            <label>Krój pisma odręcznego:</label>
+            <select id="f_styl_pisma" onchange="updatePreview()">
+                <option value="'Playwrite PL', cursive">Przedwojenne pismo urzędowe</option>
+                <option value="'Great Vibes', cursive">Ozdobne pióro wieczne</option>
+                <option value="'Alex Brush', cursive">Ekspresyjne pismo urzędnika</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Wielkość czcionki tekstu głównego:</label>
+            <select id="f_wielkosc_czcionki" onchange="updatePreview()">
+                <option value="11px">11 pikseli (Drobny druk)</option>
+                <option value="12px" selected>12 pikseli (Standardowy)</option>
+                <option value="13px">13 pikseli (Wyraźny)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label style="flex-direction: row; gap: 10px; cursor: pointer; align-items: center; font-size: 0.9rem;">
+                <input type="checkbox" id="f_jednolity_maszynowy" onchange="updatePreview()" style="width: auto; margin: 0;">
+                Zamień całość na jednolity tekst maszynowy
+            </label>
+        </div>
+
         <div id="miejsce-na-formularz"></div>
         <div class="btn-group">
             <button class="btn btn-pdf" onclick="window.print()">🖨️ Drukuj / PDF</button>
