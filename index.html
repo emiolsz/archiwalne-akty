@@ -98,16 +98,36 @@
                     updatePreview();
                 });
         }
-                function updatePreview() {
-            const inputs = document.getElementById('miejsce-na-formularz').querySelectorAll('input, textarea, select');
-            inputs.forEach(el => {
-                const pId = el.id.replace('f_', 'p_');
-                const target = document.getElementById(pId);
-                if(target) target.innerText = el.value;
-            });
-            const nr = document.getElementById('f_nr_aktu'); if(nr) document.getElementById('p_nr_aktu').innerText = nr.value;
-            const mj = document.getElementById('f_miejscowosc_margines'); if(mj) document.getElementById('p_miejscowosc_margines').innerText = mj.value;
-        }
+              function updatePreview() {
+    const maszynowy = document.getElementById('f_jednolity_maszynowy').checked;
+    const krójWybrany = document.getElementById('f_styl_pisma').value;
+    const rozmiarWybrany = document.getElementById('f_wielkosc_czcionki').value;
+
+    document.documentElement.style.setProperty('--akt-font-size', rozmiarWybrany);
+
+    if (maszynowy) {
+        document.documentElement.style.setProperty('--handwriting-font', "'Courier Prime', monospace");
+        document.documentElement.style.setProperty('--main-text-font', "'Courier Prime', monospace");
+        document.documentElement.style.setProperty('--ink-hand', "#2b231a"); 
+        document.getElementById('opcja-kroju').style.opacity = "0.5";
+    } else {
+        document.documentElement.style.setProperty('--handwriting-font', krójWybrany);
+        document.documentElement.style.setProperty('--main-text-font', "'Playfair Display', serif");
+        document.documentElement.style.setProperty('--ink-hand', "#192743"); 
+        document.getElementById('opcja-kroju').style.opacity = "1";
+    }
+
+    document.getElementById('miejsce-na-formularz').querySelectorAll('input, textarea, select').forEach(el => {
+        const target = document.getElementById(el.id.replace('f_', 'p_'));
+        if(target) target.innerText = el.value;
+    });
+
+    const nr = document.getElementById('f_nr_aktu'); if(nr) document.getElementById('p_nr_aktu').innerText = nr.value;
+    const mj = document.getElementById('f_miejscowosc_margines'); if(mj) document.getElementById('p_miejscowosc_margines').innerText = mj.value;
+    
+    const ks = document.getElementById('f_ksiadz'); 
+    if(ks) document.getElementById('p_ksiadz_podpis').innerText = ks.value;
+}
 
         function pobierzJakoJPG() { 
             html2canvas(document.getElementById('preview-wrapper'), { scale: 2, useCORS: true }).then(canvas => { 
