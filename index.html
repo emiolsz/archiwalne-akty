@@ -83,8 +83,12 @@
         async function initPython() { pyodideInstance = await loadPyodide(); await pyodideInstance.runPythonAsync(`baza_aktow = {}\nimport json`); }
         initPython();
 
-        function wczytajSzablon() {
+                function wczytajSzablon() {
             const typ = document.getElementById('f_typ_aktu').value;
+            const zapamietanyKroj = document.getElementById('f_styl_pisma') ? document.getElementById('f_styl_pisma').value : "'Playwrite PL', cursive";
+            const zapamietanyRozmiar = document.getElementById('f_wielkosc_czcionki') ? document.getElementById('f_wielkosc_czcionki').value : "12px";
+            const zapamietanyMaszynowy = document.getElementById('f_jednolity_maszynowy') ? document.getElementById('f_jednolity_maszynowy').checked : false;
+
             fetch(`akt_${typ}.html`)
                 .then(res => res.text())
                 .then(html => {
@@ -93,11 +97,17 @@
                     document.getElementById('miejsce-na-formularz').innerHTML = doc.getElementById('form-inputs').innerHTML;
                     document.getElementById('miejsce-na-tekst-aktu').innerHTML = doc.getElementById('form-text').innerHTML;
                     
-                    const inputs = document.getElementById('miejsce-na-formularz').querySelectorAll('input, textarea, select');
-                    inputs.forEach(el => el.addEventListener('input', updatePreview));
+                    if(document.getElementById('f_styl_pisma')) document.getElementById('f_styl_pisma').value = zapamietanyKroj;
+                    if(document.getElementById('f_wielkosc_czcionki')) document.getElementById('f_wielkosc_czcionki').value = zapamietanyRozmiar;
+                    if(document.getElementById('f_jednolity_maszynowy')) document.getElementById('f_jednolity_maszynowy').checked = zapamietanyMaszynowy;
+
+                    document.getElementById('miejsce-na-formularz').querySelectorAll('input, textarea, select').forEach(el => {
+                        el.addEventListener('input', updatePreview);
+                    });
                     updatePreview();
                 });
         }
+
               function updatePreview() {
     const maszynowy = document.getElementById('f_jednolity_maszynowy').checked;
     const krójWybrany = document.getElementById('f_styl_pisma').value;
