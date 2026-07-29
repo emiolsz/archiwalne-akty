@@ -1,0 +1,20 @@
+<div id="form-inputs">
+    <div class="form-group"><label>Numer aktu</label><input type="text" id="f_nr_aktu" value="39"></div>
+    <div class="form-group"><label>Miejscowość w marginesie</label><input type="text" id="f_miejscowosc_margines" value="Karolewo"></div>
+    <div class="form-group"><label>Miejsce sporządzenia aktu</label><input type="text" id="f_miejsce" value="Karolewie"></div>
+    <div class="form-group"><label>Data ślubu słownie</label><input type="text" id="f_data" value="dwudziestego czwartego czerwca tysiąc dziewięćset dwudziestego trzeciego"></div>
+    <div class="form-group"><label>Godzina ślubu</label><input type="text" id="f_godzina" value="pierwszej po południu"></div>
+    <div class="form-group"><label>Świadek 1 (imię i nazwisko)</label><input type="text" id="f_swiadek1" value="Stanisława Bednarskiego"></div>
+    <div class="form-group"><label>Świadek 2 (imię i nazwisko)</label><input type="text" id="f_swiadek2" value="Jana Bogusza"></div>
+    <div class="form-group"><label>Zawód / status świadków</label><input type="text" id="f_swiadkowie_status" value="robotników z Fabryki"></div>
+    <div class="form-group"><label>Pan Młody (imię, wiek, parafia urodzenia)</label><textarea id="f_pan_mlody" rows="3">Stanisławem Chmurą, kawalerem, wyrobnikiem lat dwadzieścia siedem mającym, w Karolewie zamieszkałym, urodzonym w parafii Matki Boskiej Loretańskiej w Warszawie-Pradze</textarea></div>
+    <div class="form-group"><label>Rodzice Pana Młodego</label><textarea id="f_pm_rodzice" rows="2">nieżyjącej Małgorzaty Chmura, niezamężnej</textarea></div>
+    <div class="form-group"><label>Panna Młoda (imię, wiek, wieś urodzenia)</label><textarea id="f_panna" rows="3">Eugenją Kierubińską, panną lat dziewiętnaście mającą, w Karolewie przy matce zamieszkałą, urodzoną w Teklinowie parafii Żyrardów powiatu Błońskiego</textarea></div>
+    <div class="form-group"><label>Rodzice Panny Młodej</label><textarea id="f_panna_rodzice" rows="2">niegdy Jana i żyjącej Anny z Hubrymskich małżonków Kierubińskich</textarea></div>
+    <div class="form-group"><label>Daty zapowiedzi</label><input type="text" id="f_zapowiedzi" value="dziesiątym czerwca, siedemnastym i dwudziestym czwartym"></div>
+    <div class="form-group"><label>Ksiądz udzielający ślubu</label><input type="text" id="f_ksiadz" value="Anastazego Chabowskiego proboszcza miejscowego"></div>
+</div>
+
+<div id="form-text">
+    Działo się we wsi <span class="recznie" id="p_miejsce"></span>, dnia <span class="recznie" id="p_data"></span> roku, o godzinie <span class="recznie" id="p_godzina"></span>. W obecności świadków: <span class="recznie" id="p_swiadek1"></span> i <span class="recznie" id="p_swiadek2"></span>, obydwóch pełnoletnich <span class="recznie" id="p_swiadkowie_status"></span>, został zawarty związek małżeński między <span class="recznie" id="p_pan_mlody"></span>, synem <span class="recznie" id="p_pm_rodzice"></span>, a <span class="recznie" id="p_panna"></span>, córką <span class="recznie" id="p_panna_rodzice"></span>. Małżeństwo to poprzedziły trzy krotne zapowiedzi ogłoszone w tutejszym parafialnym Kościele w dniu <span class="recznie" id="p_zapowiedzi"></span> roku bieżącego. Nowożeńcy oświadczają, że umowy przedślubnej nie zawarli. Pozwolenie matki panny młodej obecnej przy niniejszym akcie zgłoszone ustnie. Obrzęd religijny ich ślubu został dopełniony przez Księdza <span class="recznie" id="p_ksiadz"></span>. Akt ten nowożeńcom i świadkom został przeczytany i podpisany został.
+</div>
