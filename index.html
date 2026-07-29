@@ -72,7 +72,7 @@
                     updatePreview();
                 });
         }
-        function updatePreview() {
+                function updatePreview() {
             const inputs = document.getElementById('miejsce-na-formularz').querySelectorAll('input, textarea, select');
             inputs.forEach(el => {
                 const pId = el.id.replace('f_', 'p_');
@@ -82,14 +82,18 @@
             const nr = document.getElementById('f_nr_aktu'); if(nr) document.getElementById('p_nr_aktu').innerText = nr.value;
             const mj = document.getElementById('f_miejscowosc_margines'); if(mj) document.getElementById('p_miejscowosc_margines').innerText = mj.value;
         }
-        function pobierzJakoJPG() { html2canvas(document.getElementById('preview-wrapper'), { scale: 2, useCORS: true }).then(canvas => { const link = document.createElement('a'); link.download = 'akt.jpg'; link.href = canvas.toDataURL('image/jpeg', 0.9); link.click(); }); }
-        let isCropMode = false; let isDrawing = false; let startX, startY; const previewEl = document.getElementById('preview-wrapper'); const cropBox = document.getElementById('crop-box');
-        function toggleCropMode() { isCropMode = !isCropMode; const btn = document.getElementById('crop-btn'); if (isCropMode) { btn.classList.add('active'); btn.innerText = " Zakreśl myszką..."; previewEl.classList.add('crop-mode'); } else { btn.classList.remove('active'); btn.innerText = " Kopiuj fragment (PNG)"; previewEl.classList.remove('crop-mode'); cropBox.style.display = 'none'; } }
-        previewEl.addEventListener('mousedown', (e) => { if (!isCropMode) return; isDrawing = true; const rect = previewEl.getBoundingClientRect(); startX = e.clientX - rect.left; startY = e.clientY - rect.top; cropBox.style.left = e.clientX + 'px'; cropBox.style.top = e.clientY + 'px'; cropBox.style.width = '0px'; cropBox.style.height = '0px'; cropBox.style.display = 'block'; });
-        window.addEventListener('mousemove', (e) => { if (!isCropMode || !isDrawing) return; const rect = previewEl.getBoundingClientRect(); const currentX = e.clientX - rect.left; const currentY = e.clientY - rect.top; const width = Math.abs(currentX - startX); const height = Math.abs(currentY - startY); cropBox.style.left = Math.min(startX, currentX) + rect.left + 'px'; cropBox.style.top = Math.min(startY, currentY) + rect.top + 'px'; cropBox.style.width = width + 'px'; cropBox.style.height = height + 'px'; });
-        window.addEventListener('mouseup', (e) => { if (!isCropMode || !isDrawing) return; isDrawing = false; const rect = previewEl.getBoundingClientRect(); const currentX = e.clientX - rect.left; const currentY = e.clientY - rect.top; const x = Math.min(startX, currentX); const y = Math.min(startY, currentY); const width = Math.abs(currentX - startX); const height = Math.abs(currentY - startY); if (width > 10 && height > 10) { html2canvas(previewEl, { scale: 2, useCORS: true, x: x, y: y, width: width, height: height }).then(canvas => { canvas.toBlob((blob) => { navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(() => { alert("Skopiowano fragment!"); toggleCropMode(); }); }, 'image/png'); }); } else { cropBox.style.display = 'none'; } });
+
+        function pobierzJakoJPG() { 
+            html2canvas(document.getElementById('preview-wrapper'), { scale: 2, useCORS: true }).then(canvas => { 
+                const link = document.createElement('a'); 
+                link.download = 'akt.jpg'; 
+                link.href = canvas.toDataURL('image/jpeg', 0.9); 
+                link.click(); 
+            }); 
+        }
         window.onload = wczytajSzablon;
     </script>
 </body>
 </html>
+
 
