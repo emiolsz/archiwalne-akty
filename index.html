@@ -2,12 +2,12 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Generator Aktów Archiwalnych</title>
-    <link rel="preconnect" href="https://googleapis.com">
-    <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@600;800&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Courier+Prime:ital,wght@0,700;1,700&family=EB+Garamond:ital,wght@0,600;1,600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Playwrite+PL:wght@300&display=swap" rel="stylesheet">
-    <script src="https://cloudflare.com"></script>
-    <script src="https://jsdelivr.net"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@600;800&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Courier+Prime:ital,wght@0,700;1,700&family=EB+Garamond:ital,wght@0,600;1,600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Playwrite+PL:wght@300&display=swap" rel="stylesheet">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --bg-paper: #e6dfc3; --ink-print: #2b231a; --ink-hand: #192743; --margin-line: #a69875; --akt-font-size: 12px; --handwriting-font: 'Playwrite PL', cursive; --main-text-font: 'Playfair Display', serif; }
 
@@ -28,6 +28,7 @@
         .crop-mode { cursor: crosshair !important; }
         .crop-selection { border: 2px dashed #c0392b; background: rgba(192, 57, 43, 0.15); position: absolute; z-index: 9999; display: none; pointer-events: none; }
     </style>
+    <link rel="stylesheet" href="print-responsive.css">
 </head>
 <body>
     <div id="crop-box" class="crop-selection"></div>
@@ -81,7 +82,7 @@
     <script>
         let pyodideInstance = null;
         async function initPython() { pyodideInstance = await loadPyodide(); await pyodideInstance.runPythonAsync(`baza_aktow = {}\nimport json`); }
-        initPython();
+        // Nie inicjuj Pyodide: aktualne generatory działają w JavaScript i nie wymagają Pythona.
 
                 function wczytajSzablon() {
             const typ = document.getElementById('f_typ_aktu').value;
