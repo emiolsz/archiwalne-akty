@@ -149,7 +149,7 @@
                 link.click(); 
             }); 
         }
-        window.onload = wczytajSzablon;
+        window.onload = () => { const typ = new URLSearchParams(window.location.search).get("typ"); if (["urodzenia","malzenstwo","zgon"].includes(typ)) document.getElementById("f_typ_aktu").value = typ; wczytajSzablon(); };
     </script>
 </body>
 </html>
