@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Generator Aktów Archiwalnych</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@600;800&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Courier+Prime:ital,wght@0,700;1,700&family=EB+Garamond:ital,wght@0,600;1,600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Playwrite+PL:wght@300&display=swap" rel="stylesheet">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root { --bg-paper: #e6dfc3; --ink-print: #2b231a; --ink-hand: #192743; --margin-line: #a69875; --akt-font-size: 12px; --handwriting-font: 'Playwrite PL', cursive; --main-text-font: 'Playfair Display', serif; }
+
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #4a4e51; display: flex; gap: 25px; height: 95vh; }
+        .form-container { flex: 1; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); overflow-y: auto; box-sizing: border-box; }
+        .preview-container { width: 210mm; height: 297mm; min-width: 210mm; background-color: var(--bg-paper); color: var(--ink-print); box-shadow: inset 0 0 50px rgba(0,0,0,0.2), 5px 5px 25px rgba(0,0,0,0.4); border: 1px solid #baa882; display: flex; position: relative; box-sizing: border-box; }
+        .akt-side-margin { flex: 1; max-width: 25%; padding: 60px 20px; box-sizing: border-box; border-right: 2px solid var(--margin-line); text-align: right; }
+        
+        .akt-main-text { flex: 3; max-width: 75%; padding: 60px 45px; font-family: var(--main-text-font); font-size: var(--akt-font-size); line-height: 2.4; text-align: justify; box-sizing: border-box; }
+
+        .form-group { margin-bottom: 12px; display: flex; flex-direction: column; }
+        label { margin-bottom: 4px; font-weight: 600; font-size: 0.85rem; color: #34495e; }
+        input, textarea, select { padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
+        .recznie { font-family: var(--handwriting-font); font-size: 1.05em; font-weight: bold; color: var(--ink-hand); padding: 0 4px; display: inline; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .btn { padding: 14px; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.95rem; width: 100%; }
+        .btn-pdf { background: #2980b9; } .btn-jpg { background: #27ae60; } .btn-crop { background: #e67e22; } .btn-crop.active { background: #c0392b; }
+        .crop-mode { cursor: crosshair !important; }
+        .crop-selection { border: 2px dashed #c0392b; background: rgba(192, 57, 43, 0.15); position: absolute; z-index: 9999; display: none; pointer-events: none; }
+    </style>
+    <link rel="stylesheet" href="print-responsive.css">
+</head>
+<body>
+    <div id="crop-box" class="crop-selection"></div>
+        <div class="form-container">
+        <h2>Panel Sterowania</h2>
+        <p><a href="mapa.html" style="display:block;padding:13px;background:#254b3b;color:#fff;border-radius:6px;text-align:center;text-decoration:none;font-weight:700;">🗺️ Otwórz mapę historyczną 1569–1945 (wersja robocza)</a></p>
+        <div class="form-group">
+            <label>Wybierz rodzaj aktu:</label>
+            <select id="f_typ_aktu" onchange="wczytajSzablon()">
+                <option value="malzenstwo">Akt Małżeństwa</option>
+                <option value="urodzenia">Akt Urodzenia i Chrztu</option>
+                <option value="zgon">Akt Zgonu</option>
+            </select>
+        </div>
+        <div class="form-group" id="opcja-kroju">
+            <label>Krój pisma odręcznego:</label>
+            <select id="f_styl_pisma" onchange="updatePreview()">
+                <option value="'Playwrite PL', cursive">Przedwojenne pismo urzędowe</option>
+                <option value="'Great Vibes', cursive">Ozdobne pióro wieczne</option>
+                <option value="'Alex Brush', cursive">Ekspresyjne pismo urzędnika</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Wielkość czcionki tekstu głównego:</label>
+            <select id="f_wielkosc_czcionki" onchange="updatePreview()">
+                <option value="11px">11 pikseli (Drobny druk)</option>
+                <option value="12px" selected>12 pikseli (Standardowy)</option>
+                <option value="13px">13 pikseli (Wyraźny)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label style="flex-direction: row; gap: 10px; cursor: pointer; align-items: center; font-size: 0.9rem;">
+                <input type="checkbox" id="f_jednolity_maszynowy" onchange="updatePreview()" style="width: auto; margin: 0;">
+                Zamień całość na jednolity tekst maszynowy
+            </label>
+        </div>
+
+        <div id="miejsce-na-formularz"></div>
+        <div class="btn-group">
+            <button class="btn btn-pdf" onclick="window.print()">🖨️ Drukuj / PDF</button>
+            <button class="btn btn-jpg" onclick="pobierzJakoJPG()">🖼️ Pobierz JPG</button>
+            <button class="btn btn-crop" id="crop-btn" onclick="toggleCropMode()">✂️ Kopiuj fragment (PNG)</button>
+        </div>
+    </div>
+    <div class="preview-container" id="preview-wrapper">
+        <div class="akt-side-margin">
+            <span style="font-family:'Cinzel';font-size:2.6rem;font-weight:800;">№</span><span class="recznie" id="p_nr_aktu"></span>
+            <br><br><span class="recznie" id="p_miejscowosc_margines" style="font-size:1.3rem;"></span>
+        </div>
+        <div class="akt-main-text" id="miejsce-na-tekst-aktu"></div>
+    </div>
+    <script>
+        let pyodideInstance = null;
+        async function initPython() { pyodideInstance = await loadPyodide(); await pyodideInstance.runPythonAsync(`baza_aktow = {}\nimport json`); }
+        // Nie inicjuj Pyodide: aktualne generatory działają w JavaScript i nie wymagają Pythona.
+
+                function wczytajSzablon() {
+            const typ = document.getElementById('f_typ_aktu').value;
+            const zapamietanyKroj = document.getElementById('f_styl_pisma') ? document.getElementById('f_styl_pisma').value : "'Playwrite PL', cursive";
+            const zapamietanyRozmiar = document.getElementById('f_wielkosc_czcionki') ? document.getElementById('f_wielkosc_czcionki').value : "12px";
+            const zapamietanyMaszynowy = document.getElementById('f_jednolity_maszynowy') ? document.getElementById('f_jednolity_maszynowy').checked : false;
+
+            fetch(`akt_${typ}.html`)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    document.getElementById('miejsce-na-formularz').innerHTML = doc.getElementById('form-inputs').innerHTML;
+                    document.getElementById('miejsce-na-tekst-aktu').innerHTML = doc.getElementById('form-text').innerHTML;
+                    
+                    if(document.getElementById('f_styl_pisma')) document.getElementById('f_styl_pisma').value = zapamietanyKroj;
+                    if(document.getElementById('f_wielkosc_czcionki')) document.getElementById('f_wielkosc_czcionki').value = zapamietanyRozmiar;
+                    if(document.getElementById('f_jednolity_maszynowy')) document.getElementById('f_jednolity_maszynowy').checked = zapamietanyMaszynowy;
+
+                    document.getElementById('miejsce-na-formularz').querySelectorAll('input, textarea, select').forEach(el => {
+                        el.addEventListener('input', updatePreview);
+                    });
+                    updatePreview();
+                });
+        }
+
+              function updatePreview() {
+    const maszynowy = document.getElementById('f_jednolity_maszynowy').checked;
+    const krójWybrany = document.getElementById('f_styl_pisma').value;
+    const rozmiarWybrany = document.getElementById('f_wielkosc_czcionki').value;
+
+    document.documentElement.style.setProperty('--akt-font-size', rozmiarWybrany);
+
+    if (maszynowy) {
+        document.documentElement.style.setProperty('--handwriting-font', "'Courier Prime', monospace");
+        document.documentElement.style.setProperty('--main-text-font', "'Courier Prime', monospace");
+        document.documentElement.style.setProperty('--ink-hand', "#2b231a"); 
+        document.getElementById('opcja-kroju').style.opacity = "0.5";
+    } else {
+        document.documentElement.style.setProperty('--handwriting-font', krójWybrany);
+        document.documentElement.style.setProperty('--main-text-font', "'Playfair Display', serif");
+        document.documentElement.style.setProperty('--ink-hand', "#192743"); 
+        document.getElementById('opcja-kroju').style.opacity = "1";
+    }
+
+    document.getElementById('miejsce-na-formularz').querySelectorAll('input, textarea, select').forEach(el => {
+        const target = document.getElementById(el.id.replace('f_', 'p_'));
+        if(target) target.innerText = el.value;
+    });
+
+    const nr = document.getElementById('f_nr_aktu'); if(nr) document.getElementById('p_nr_aktu').innerText = nr.value;
+    const mj = document.getElementById('f_miejscowosc_margines'); if(mj) document.getElementById('p_miejscowosc_margines').innerText = mj.value;
+    
+    const ks = document.getElementById('f_ksiadz'); 
+    if(ks) document.getElementById('p_ksiadz_podpis').innerText = ks.value;
+}
+
+        function pobierzJakoJPG() { 
+            html2canvas(document.getElementById('preview-wrapper'), { scale: 2, useCORS: true }).then(canvas => { 
+                const link = document.createElement('a'); 
+                link.download = 'akt.jpg'; 
+                link.href = canvas.toDataURL('image/jpeg', 0.9); 
+                link.click(); 
+            }); 
+        }
+        window.onload = () => { const typ = new URLSearchParams(window.location.search).get("typ"); if (["urodzenia","malzenstwo","zgon"].includes(typ)) document.getElementById("f_typ_aktu").value = typ; wczytajSzablon(); };
+    </script>
+</body>
+</html>
+
+
