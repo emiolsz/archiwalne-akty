@@ -29,7 +29,7 @@
         .crop-selection { border: 2px dashed #c0392b; background: rgba(192, 57, 43, 0.15); position: absolute; z-index: 9999; display: none; pointer-events: none; }
     </style>
     <link rel="stylesheet" href="print-responsive.css">
-</head>
+<style>body.catalogue{display:block;height:auto;background:#f4f1e8;color:#234839}body.catalogue>.form-container,body.catalogue>.preview-container,body.catalogue>#preview-wrapper{display:none}.catalogue main{max-width:1000px;margin:40px auto}.actcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}.actcards a{display:block;background:white;border:1px solid #c8c6b7;border-radius:8px;padding:24px;color:#234839;text-decoration:none}.actcards a:hover{background:#e1e9df}</style><script>if(!new URLSearchParams(location.search).has('typ')){document.addEventListener('DOMContentLoaded',()=>{document.body.classList.add('catalogue');const m=document.createElement('main');m.innerHTML='<a href="index.html">← Strona główna</a><h1>Wybierz wzór aktu</h1><p>Wybierz dokument, następnie sprawdź jego kontekst na mapie historycznej.</p><div class="actcards">'+[['A','Zabór pruski · Standesamt A','Akt urodzenia',1895],['C','Zabór pruski · Standesamt C','Akt zgonu',1882],['T','Zabór pruski · księga tabelaryczna','Akt małżeństwa',1867],['P','Polska · wzór polski','Akt małżeństwa',1923]].map(x=>'<a href="mapa.html?akt='+x[0]+'&rok='+x[3]+'"><small>'+x[1]+'</small><h2>'+x[2]+'</h2><p>Wzór z '+x[3]+' roku</p>Mapa historyczna i generator →</a>').join('')+'</div>';document.body.prepend(m)})}</script></head>
 <body>
     <div id="crop-box" class="crop-selection"></div>
         <div class="form-container">
@@ -149,7 +149,7 @@
                 link.click(); 
             }); 
         }
-        window.onload = () => { const typ = new URLSearchParams(window.location.search).get("typ"); if (["urodzenia","malzenstwo","zgon"].includes(typ)) document.getElementById("f_typ_aktu").value = typ; wczytajSzablon(); };
+        window.onload = () => { const typ = new URLSearchParams(window.location.search).get("typ"); if(!typ)return; if (["urodzenia","malzenstwo","zgon"].includes(typ)) document.getElementById("f_typ_aktu").value = typ; wczytajSzablon(); };
     </script>
 </body>
 </html>
