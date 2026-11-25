@@ -30,12 +30,13 @@
     </style>
     <link rel="stylesheet" href="print-responsive.css">
 <style>body.catalogue{display:block;height:auto;background:#f4f1e8;color:#234839}body.catalogue>.form-container,body.catalogue>.preview-container,body.catalogue>#preview-wrapper{display:none}.catalogue main{max-width:1000px;margin:40px auto}.actcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}.actcards a{display:block;background:white;border:1px solid #c8c6b7;border-radius:8px;padding:24px;color:#234839;text-decoration:none}.actcards a:hover{background:#e1e9df}</style><script>if(!new URLSearchParams(location.search).has('typ')){document.addEventListener('DOMContentLoaded',()=>{document.body.classList.add('catalogue');const m=document.createElement('main');m.innerHTML='<a href="index.html">← Strona główna</a><h1>Generator aktów archiwalnych</h1><p>Wybierz okres historyczny i rodzaj aktu.</p>'+[
-['Księgi kościelne przed rozbiorami','Do 1795',[null,null,null]],
+['Księgi kościelne przed rozbiorami','Przed rozbiorami',[['LU',1751],['LM',1731],['LC',1730]]],
+['Zabór austriacki – Galicja','Księgi tabelaryczne od 1784',[['GU',1820],['GM',1854],['GC',1845]]],
 ['Zabór pruski – księgi tabelaryczne','1794–1874, zależnie od miejscowości',[null,['T',1867],null]],
-['Księgi napoleońskie i polskojęzyczne','Od 1808; zasięg zależny od miejscowości',[null,null,null]],
+['Księgi napoleońskie i polskojęzyczne','Od 1808; zasięg zależny od miejscowości',[['NU',1810],null,null]],
 ['Zabór rosyjski – akty rosyjskojęzyczne','1868–1915',[['RA',1915],['RM',1915],['RC',1915]]],
 ['Zabór pruski – Standesamt','Od 1874; do zmiany administracji w danej miejscowości',[['A',1895],['B',1896],['C',1882]]],
-['Polska – okres międzywojenny','1918–1939',[null,['P',1923],null]],
+['Polska – okres międzywojenny','1918–1939',[['PU',1921],['P',1923],['PC',1930]]],
 ['Polska – okres wojenny','1939–1945',[null,null,null]]
 ].map(x=>'<section style="margin:30px 0"><h2>'+x[0]+'</h2><p>'+x[1]+'</p><div class="actcards">'+['Urodzenia','Małżeństwa','Zgony'].map((n,i)=>{const v=x[2][i];return v?'<a href="mapa.html?akt='+v[0]+'&rok='+v[1]+'"><strong>'+n+'</strong><p>'+('Wzór z '+v[1])+'</p>Mapa historyczna →</a>':'<a style="opacity:.65" aria-disabled="true"><strong>'+n+'</strong><p>W przygotowaniu</p></a>'}).join('')+'</div></section>').join('');document.body.prepend(m)})}</script></head>
 <body>
